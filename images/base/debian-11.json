@@ -4,9 +4,9 @@
         {
             "type": "qemu",
             "vm_name": "debian-11-{{build_type}}",
-            "headless": true,
+            "headless": false,
 
-	    "output_directory": "artifact_{{timestamp}}",
+	          "output_directory": "artifact_{{timestamp}}",
             "iso_url": "file:///home/leeming/Downloads/debian-11.3.0-amd64-netinst.iso",
             "iso_checksum": "sha512:2810f894afab9ac2631ddd097599761c1481b85e629d6a3197fe1488713af048d37241eb85def681ba86e62b406dd9b891ee1ae7915416335b6bb000d57c1e53",
             "memory": "2048",
@@ -28,12 +28,5 @@
                 "<enter>"
             ]
         }
-    ],
-    "provisioners": [
-    {
-      "type": "shell",
-      "script": "install-ansible-deb.sh",
-      "execute_command": "echo 'packer' | sudo -S bash -c '{{ .Path }}'"
-    }
-  ]
+    ]
 }
