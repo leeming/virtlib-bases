@@ -1,0 +1,41 @@
+{
+    "variables": {
+        "vm_base_name": "debian-11-init",
+        "iso_path": "file:///home/leeming/Downloads/debian-11.3.0-amd64-netinst.iso",
+        "iso_checksum": "sha512:2810f894afab9ac2631ddd097599761c1481b85e629d6a3197fe1488713af048d37241eb85def681ba86e62b406dd9b891ee1ae7915416335b6bb000d57c1e53",
+        "bootstrap_file": "debian-11-alt.cfg",
+        "_bootstrap_comment": "Hmm not fully abstracted as this is hard coded in the bootstrap file",
+        "bootstrap_user": "packer",
+        "bootstrap_password": "packer"
+    },
+    "builders":
+    [
+        {
+            "type": "qemu",
+            "vm_name": "{{ user `vm_base_name` }}-{{build_type}}",
+            "headless": true,
+
+	        "output_directory": "artifacts/{{timestamp}}",
+            "iso_url": "{{ user `iso_path` }}",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "memory": "2048",
+            "disk_size": "5000",
+            "cpus": 2,
+
+            "ssh_username": "{{ user `bootstrap_user` }}",
+            "ssh_password": "{{ user `bootstrap_password` }}",
+            "ssh_timeout": "10m",
+
+            "http_directory": "http",
+            "boot_command": [
+                "<esc><wait><wait>",
+                "install ",
+                "auto=true ",
+                "priority=critical ",
+                "interface=auto ",
+                "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `bootstrap_file` }} ",
+                "<enter>"
+            ]
+        }
+    ]
+}
