@@ -1,0 +1,65 @@
+---
+# tasks file for vm-setup
+
+## Setup Networking stuff
+# Custom DNS (?) else
+- name: Configure /etc/resolv.conf
+  ansible.builtin.template:
+    src: etc_resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+## Set hostname to something sensible
+- name: Set a hostname specifying strategy
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+    #use: systemd
+
+
+
+## Configure data shares
+- name: Create data directory on vm
+  file:
+    path: /data
+    state: directory
+
+# Mount data share from host
+- name: Mount data
+  ansible.posix.mount:
+    path: /data
+    src: data
+    fstype: 9p
+    opts: trans=virtio,version=9p2000.L,rw
+    state: present
+
+# Other data mounts?
+
+
+## Setup primary user
+# Create user
+- name: Create primary user
+  ansible.builtin.user:
+    name: "{{ username }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    groups: sudo
+    append: yes
+
+# Add in keys
+- name: Set authorized key took from file
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ lookup('file', ssh_public_key) }}"
+
+# Sudoers
+- lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^{{ username }}'
+    line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+# 

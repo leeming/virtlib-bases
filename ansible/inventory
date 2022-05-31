@@ -1,0 +1,2 @@
+[tests]
+192.168.122.51 ansible_user=packer

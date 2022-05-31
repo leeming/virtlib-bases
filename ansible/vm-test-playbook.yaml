@@ -1,0 +1,18 @@
+---
+# playbook.yml
+- name: 'test role'
+  hosts: localhost
+  become: true
+  
+  roles:
+    # - role: vm
+    #   hostname: another-test-hostname
+    #   virtual_machine_name: another-test-name
+    #   virtual_machine_image: another-test-image
+    #   username: moby
+    #   ssh_public_key: /home/leeming/.ssh/vm_rsa.pub
+
+    - role: vm
+      virtual_machine_name: testhostname
+      virtual_machine_image: testhostname
+

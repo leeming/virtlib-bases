@@ -1,0 +1,7 @@
+---
+# defaults file for vm-data
+
+
+hostname: base-debian
+username: user
+ssh_public_key: /

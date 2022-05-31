@@ -6,9 +6,11 @@
             "vm_name": "deb-ansible",
             "headless": true,
 
-	        "output_directory": "artifact_{{timestamp}}",
+	        
+	        "output_directory": "artifacts/{{timestamp}}",
+
             "disk_image": true,
-            "iso_url": "../base/artifact_1653342882/debian-11-qemu",
+            "iso_url": "../base/artifacts/1653418730/debian-11-init",
             "iso_checksum": "none",
             "memory": "2048",
             "disk_size": "5000",

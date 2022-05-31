@@ -1,0 +1,11 @@
+---
+# playbook.yml
+- name: 'test role'
+  hosts: all
+  become: true
+  
+  roles:
+    - role: vm-setup
+      hostname: another-test-hostname
+      username: moby
+      ssh_public_key: /home/leeming/.ssh/vm_rsa.pub
