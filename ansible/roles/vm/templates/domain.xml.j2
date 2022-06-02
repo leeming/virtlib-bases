@@ -1,6 +1,6 @@
 <domain type='kvm'>
-  <name>{{ virtual_machine_name }}</name>
-  <uuid>{{ virtual_machine_name|to_uuid }}</uuid>
+  <name>{{ vm_name }}</name>
+  <uuid>{{ vm_name|to_uuid }}</uuid>
   <memory unit='MiB'>{{ virtual_machine_memory }}</memory>
   <vcpu placement='static'>{{ virtual_machine_cpus }}</vcpu>
   <os>
@@ -24,17 +24,9 @@
     <disk type='file' device='disk'>
       <!--Guest kernel must be Linux 5.0+ to support discard with virtio bus-->
       <driver name='qemu' type='qcow2' discard='unmap'/>
-      <source file='/vms/{{ virtual_machine_image }}/os.qcow2'/>
+      <source file='/vms/{{ vm_name }}/os.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
-{% if virtual_machine_cloudinit_cfg is defined %}
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <source file='{{ virtual_machine_cloudinit_iso }}'/>
-      <target dev='sdc' bus='sata'/>
-      <readonly/>
-    </disk>
-{% endif %}
     <interface type='network'>
       <source network='default'/>
       <mac address='{{ virtual_machine_macaddress }}'/>
@@ -60,7 +52,7 @@
     </console>
     <filesystem type="mount" accessmode="mapped">
       <driver type="path" wrpolicy="immediate"/>
-      <source dir="/vms/{{ virtual_machine_image }}/data"/>
+      <source dir="/vms/{{ vm_name }}/data"/>
       <target dir="data"/>
       <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
     </filesystem>

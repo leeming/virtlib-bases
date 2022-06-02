@@ -13,6 +13,5 @@
     #   ssh_public_key: /home/leeming/.ssh/vm_rsa.pub
 
     - role: vm
-      virtual_machine_name: testhostname
-      virtual_machine_image: testhostname
+      vm_name: moby-dev
 

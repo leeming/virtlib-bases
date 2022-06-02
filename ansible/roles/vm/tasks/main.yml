@@ -10,19 +10,26 @@
     - libvirt-guests
 
 
+
+# Stat VM directory, use this for when for other tasks
+## TODO: Check if VM already exists, stat and register
+- name: Check if exists
+  stat:
+    path: '{{ base_vm_dir }}/{{ vm_name }}'
+  register: vm_exists
+
 # Create VM directory
 - name: create directory for virtual machine image
   file:
-    dest: '{{ base_vm_dir }}/{{ virtual_machine_image }}'
+    dest: '{{ base_vm_dir }}/{{ vm_name }}'
     state: directory
     mode: '0755'
 
-## TODO: Check if VM already exists, stat and register
 
 # Create Data bind directory
 - name: Setup data dir
   file:
-    dest: '{{ base_vm_dir }}/{{ virtual_machine_image }}/data'
+    dest: '{{ base_vm_dir }}/{{ vm_name }}/data'
     state: directory
     mode: '0755'
     owner: libvirt-qemu
@@ -45,14 +52,14 @@
 
 - name: grow initial image for virtual machine
   command: >
-    qemu-img create -b {{ virtual_machine_source }} -f qcow2 -F qcow2 {{ base_vm_dir }}/{{ virtual_machine_image }}/os.qcow2 10G
-
+    qemu-img create -b {{ virtual_machine_source }} -f qcow2 -F qcow2 {{ base_vm_dir }}/{{ vm_name }}/os.qcow2 10G
+  when: not vm_exists.stat.exists
 
 # Resize / prep for install
 - name: grow initial image for virtual machine
   command: >
-    qemu-img resize "{{ base_vm_dir }}/{{ virtual_machine_image }}/os.qcow2" 10G
-  #when: not virtual_machine_file.stat.exists and virtual_machine_image_resize is defined
+    qemu-img resize "{{ base_vm_dir }}/{{ vm_name }}/os.qcow2" 10G
+  when: not vm_exists.stat.exists
 
 - name: check list of virtual machine definitions
   virt:
@@ -63,10 +70,17 @@
   virt:
     command: define
     xml: '{{ lookup("template", "templates/domain.xml.j2") }}'
-  when: virtual_machine_name not in virtual_machine_definitions.list_vms
+  when: vm_name not in virtual_machine_definitions.list_vms
 
 - name: configure virtual machine autostart
   virt:
-    name: '{{ virtual_machine_name }}'
+    name: '{{ vm_name }}'
     state: running
     autostart: yes
+
+- name: Get IP
+  shell: >
+    virsh net-dhcp-leases default {{ virtual_machine_macaddress }} | tail -2 | head -1 | awk '{split($5,ip,"/"); print ip[1]}'
+  register: virtip
+
+- debug: msg="{{ virtip.stdout }}"

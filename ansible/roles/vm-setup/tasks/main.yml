@@ -17,25 +17,20 @@
     name: "{{ hostname }}"
     #use: systemd
 
+- name: Replace old hosts hostname
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{hostname}}"
+    owner: root
+    group: root
+    mode: '0644'
 
-
-## Configure data shares
-- name: Create data directory on vm
-  file:
-    path: /data
-    state: directory
-
-# Mount data share from host
-- name: Mount data
-  ansible.posix.mount:
-    path: /data
-    src: data
-    fstype: 9p
-    opts: trans=virtio,version=9p2000.L,rw
+# Create a special 'data' group
+- name: Create special 'data' group
+  ansible.builtin.group:
+    name: data
     state: present
-
-# Other data mounts?
-
 
 ## Setup primary user
 # Create user
@@ -45,8 +40,9 @@
     generate_ssh_key: yes
     ssh_key_bits: 2048
     ssh_key_file: .ssh/id_rsa
-    groups: sudo
+    groups: sudo,data
     append: yes
+    shell: /bin/bash
 
 # Add in keys
 - name: Set authorized key took from file
@@ -63,3 +59,24 @@
     line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 # 
+
+## Configure data shares
+- name: Create data directory on vm
+  file:
+    path: /data
+    state: directory
+    group: data
+    mode: 0775
+
+# Mount data share from host
+- name: Mount data
+  ansible.posix.mount:
+    path: /data
+    src: data
+    fstype: 9p
+    opts: trans=virtio,version=9p2000.L,rw
+    state: present
+
+# Other data mounts?
+
+

@@ -6,6 +6,7 @@ base_vm_dir: /vms
 virtual_machine_source: "{{ base_vm_dir }}/bases/debian-11_1653825946"
 virtual_machine_image: "test-ansible"
 virtual_machine_name: "ansible2"
+vm_name: unnamed
 
 virtual_machine_memory: 1024
 virtual_machine_cpus: 1
@@ -14,7 +15,7 @@ virtual_machine_emulator: /usr/bin/qemu-system-x86_64
 virtual_machine_macaddress: >-
   02:34:56:{{
     (
-      (virtual_machine_name+ansible_fqdn)
+      (vm_name+ansible_fqdn)
       |hash("md5")
     )[:6]
     |slice(3)
