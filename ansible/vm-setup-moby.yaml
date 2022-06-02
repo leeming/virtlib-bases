@@ -1,0 +1,21 @@
+---
+- name: 'Setup Moby (docker host)'
+  hosts: all  # Change this once I understand inventory
+  become: true
+  
+  roles:
+    - role: vm-setup
+      hostname: moby
+      username: moby
+      ssh_public_key: /home/leeming/.ssh/vm_rsa.pub
+    - role: geerlingguy.docker
+      docker_users:
+      - moby
+
+  # tasks:
+  #   - name: Add primary users to docker group
+  #     user: 
+  #       name: "{{ item }}"
+  #       append: yes
+  #       groups: docker
+  #     with_items: "{{ docker_users }}"
